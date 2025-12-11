@@ -1,0 +1,85 @@
+Design & Approach Documentation
+------------------------------------------
+1. Problem Summary
+
+BIG COMPANY is employing a lot of employees. The company would like to analyze its organizational structure and identify potential improvements. The board wants to make sure that
+	Salary Compliance:
+		1.A managers earns at least 20% more than the average salary of its direct subordinates.
+		2.A managers earns no more than 50% more than that average salary of its direct subordinates.
+		3.Find the managers who are underpaid or overpaid on average salary of its direct subordinates.
+	Reporting Line Compliance:
+		1.Company wants no employee should have more than 4 managers between them and the CEO.
+		2.Find employees have a reporting line which is too long.
+
+2.Approach
+    Salary Compliance
+        For each manager,
+        1.Compute average salary of direct subordinates.
+        2.Calculate minimum required (avg × 1.20) and maximum allowed (avg × 1.50).
+        3.Compare manager’s salary:
+            - If below minimum → underpaid.
+            - If above maximum → overpaid.
+        4.Uses OrganizationChart helper class to get subordinates of managers.
+        5.Uses SalaryPolicy helper class for thresholds limits of min and maximum salaries.
+
+    Reporting Line Compliance:
+        For each employee,
+        1.Find the employees whose reporting depth exceeds a threshold.
+        2.Compute the depth calculation using iterative loop.
+        If depth > 4 → violation.
+
+    EmployeeRepository:
+    Load employees from a CSV file to List<Employee>.
+
+3. Design & Architecture
+    Classes
+        Employee
+            Represents an employee record (id, firstName, LastName, salary, managerId).
+        EmployeeRepository
+            Load employees from a CSV file to List<Employee>.
+        SalaryCheckerService
+            Holds salary compliance results for a manager (shortfall, excess, thresholds).
+        ReportingLineService
+            Holds reporting line compliance results (depth, excessDepth).
+        SalaryPolicy - It's helper class,
+            which contain the salary rules and handle the thresholds limit of min and maximum salaries.We can change rules without modifying other components.
+        OrganizationChart - It is help class, which can used for getting subordinates of managers.
+
+- OrganizationalComplianceApp
+	- Reads CSV file.
+	- Builds employee list.
+	- Runs compliance checks.
+	- Prints Results.
+
+4. Input
+- CSV file format
+    Id,firstName,lastName,salary,managerId
+    123,Joe,Doe,60000,
+    124,Martin,Chekov,45000,123
+    125,Bob,Ronstad,47000,123
+    300,Alice,Hasacat,50000,124
+    305,Brett,Hardleaf,34000,300
+
+5. Output
+=== Managers Underpaid ===
+UNDERPAID -> Brew Haili earns 34000.00, shortfall by 11000.00 (Min allowed 45000.00)
+UNDERPAID -> Roy Parker earns 42000.00, shortfall by 3600.00 (Min allowed 45600.00)
+UNDERPAID -> Sunny Paul earns 45000.00, shortfall by 3000.00 (Min allowed 48000.00)
+UNDERPAID -> Varun Menon earns 40000.00, shortfall by 4400.00 (Min allowed 44400.00)
+UNDERPAID -> Jyothi Das earns 37000.00, shortfall by 5000.00 (Min allowed 42000.00)
+UNDERPAID -> Nina Stone earns 35000.00, shortfall by 1000.00 (Min allowed 36000.00)
+UNDERPAID -> Vinay Rao earns 30000.00, shortfall by 3600.00 (Min allowed 33600.00)
+UNDERPAID -> Joe Doe earns 60000.00, shortfall by 12800.00 (Min allowed 72800.00)
+UNDERPAID -> Martin Chekov earns 45000.00, shortfall by 15000.00 (Min allowed 60000.00)
+UNDERPAID -> Bob Ronstad earns 47000.00, shortfall by 3400.00 (Min allowed 50400.00)
+
+=== Managers Overpaid ===
+OVERPAID -> John David earns 90000.00, excess by 4000.00 (Max allowed 86000.00)
+
+=== Reporting Depth Violations ===
+Too Long -> Jyothi Das depth is 5  (exceeds by 1)
+Too Long -> Nina Stone depth is 6  (exceeds by 2)
+Too Long -> Vinay Rao depth is 7  (exceeds by 3)
+Too Long -> Leo King depth is 8  (exceeds by 4)
+
+
